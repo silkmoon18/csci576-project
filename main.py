@@ -2,7 +2,7 @@ import time
 import cv2
 import pygame
 import ui
-from scenedetect import detect, ContentDetector
+from scenedetect import detect, ContentDetector, AdaptiveDetector
 
 input_video_path = "data/InputVideo.mp4"
 title = "csci576-project"
@@ -10,15 +10,15 @@ window_width = 960
 window_height = 540
 background_color = "#000000"
 
-scene_threshold = 50
-shot_threshold = 20
+scene_threshold = 40
+shot_threshold = 27
 
 # test
 window_width = 1500
 window_height = 800
 
 
-def generate_shot_buttons(index: int, scene: tuple) -> list[ui.button]:
+def generate_shot_buttons(index: int, scene: tuple) -> list:
     buttons = []
     shots = detect(
         input_video_path,
@@ -43,10 +43,16 @@ def generate_shot_buttons(index: int, scene: tuple) -> list[ui.button]:
     return buttons
 
 
-def generate_scene_buttons() -> list[ui.button]:
+def generate_scene_buttons() -> list:
     scenes = detect(
-        input_video_path, ContentDetector(threshold=scene_threshold), show_progress=True
+        input_video_path, AdaptiveDetector(adaptive_threshold=7), show_progress=True
     )
+
+    for i, scene in enumerate(scenes):
+        print('    Scene %2d: Start %s / Frame %d, End %s / Frame %d' % (
+            i+1,
+            scene[0].get_timecode(), scene[0].get_frames(),
+            scene[1].get_timecode(), scene[1].get_frames(),))
 
     buttons = []
     for i, scene in enumerate(scenes):
@@ -62,14 +68,14 @@ def generate_scene_buttons() -> list[ui.button]:
             lambda t=time: jump_to_time(t),
         )
         buttons.append(button)
-        buttons.extend(generate_shot_buttons(i, scene))
+        # buttons.extend(generate_shot_buttons(i, scene))
 
     return buttons
 
 
 def to_milliseconds(time: str) -> int:
     hours, minutes, seconds = map(float, time.split(":"))
-    seconds, milliseconds = map(int, str(seconds).split("."))
+    seconds, milliseconds = map(float, str(seconds).split("."))
     return ((hours * 3600) + (minutes * 60) + seconds) * 1000 + milliseconds
 
 
