@@ -7,6 +7,7 @@ class VideoFrame(UIElement):
     def __init__(
         self, screen: pygame.Surface, x: int, y: int, video_path: str = None
     ) -> None:
+        self.__frame = None
         self.__capture: cv2.VideoCapture = None
         self.load_video(video_path)
         super().__init__(screen, x, y, self.width, self.height)
@@ -45,19 +46,23 @@ class VideoFrame(UIElement):
     def load_video(self, video_path: str = None) -> None:
         if self.__capture:
             self.__capture.release()
-        self.__capture = cv2.VideoCapture(video_path)
-        self.__fps = int(self.__capture.get(cv2.CAP_PROP_FPS))
-        self.width = int(self.__capture.get(cv2.CAP_PROP_FRAME_WIDTH))
-        self.height = int(self.__capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-        self.__current_time = 0
-        if self.__fps > 0:
+        if video_path:
+            self.__capture = cv2.VideoCapture(video_path)
+            self.__fps = int(self.__capture.get(cv2.CAP_PROP_FPS))
+            self.width = int(self.__capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+            self.height = int(self.__capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
             self.__duration = int(
                 self.__capture.get(cv2.CAP_PROP_FRAME_COUNT) / self.__fps
             )
         else:
+            self.__capture = None
+            self.__fps = 0
+            self.width = 0
+            self.height = 0
             self.__duration = 0
-        
+
+        self.__current_time = 0
         self.__next()
 
     # jump to the specified time in seconds
@@ -80,6 +85,9 @@ class VideoFrame(UIElement):
 
     # move to the next frame
     def __next(self) -> bool:
+        if not self.__capture:
+            return False
+
         success, self.__frame = self.__capture.read()
         if not success:
             return False
