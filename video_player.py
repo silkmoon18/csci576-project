@@ -23,6 +23,8 @@ class VideoPlayer:
 
         self.__running = True
 
+        # NOTE: tkinter has to be initialized before pygame, else pygame will crash on macOS
+        self.__init_tkinter()
         self.__init_pygame()
         self.__init_interface()
 
@@ -35,6 +37,11 @@ class VideoPlayer:
         pygame.quit()
         quit()
 
+    # initialize tkinter root
+    def __init_tkinter(self):
+        self.__tk = Tk()
+        self.__tk.withdraw()  # hide root window
+
     # initialize pygame and related properties
     def __init_pygame(self):
         pygame.init()
@@ -45,10 +52,6 @@ class VideoPlayer:
 
     # initialize UI interface
     def __init_interface(self):
-        # init and hide tkinter root
-        self.__tk = Tk()
-        self.__tk.withdraw()
-
         # init ui elements
         self.__video_frame = ui.VideoFrame(self.__screen, 250, 0)
         self.__progress_text = ui.Text(self.__screen, 10, 10, self.font)
