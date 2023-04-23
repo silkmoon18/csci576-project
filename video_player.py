@@ -1,4 +1,4 @@
-import cv2
+from tkinter import filedialog
 import pygame
 import ui
 from scenedetect import detect, AdaptiveDetector, FrameTimecode
@@ -7,7 +7,6 @@ from scenedetect import detect, AdaptiveDetector, FrameTimecode
 class VideoPlayer:
     def __init__(
         self,
-        input_video_path: str,
         title: str,
         window_width: int,
         window_height: int,
@@ -15,7 +14,6 @@ class VideoPlayer:
         scene_threshold: float = 40,
         shot_threshold: float = 27,
     ):
-        self.__video_path = input_video_path
         self.title = title
         self.window_width = window_width
         self.window_height = window_height
@@ -27,8 +25,6 @@ class VideoPlayer:
 
         self.__init_pygame()
         self.__init_interface()
-
-        self.__process_video()
 
     # start the player
     def start(self):
@@ -49,7 +45,12 @@ class VideoPlayer:
 
     # initialize UI interface
     def __init_interface(self):
-        self.__video_frame = ui.VideoFrame(self.__screen, 250, 0, self.__video_path)
+        self.__video_frame = ui.VideoFrame(self.__screen, 250, 0)
+        self.__progress_text = ui.Text(self.__screen, 10, 10, self.font)
+
+        self.__open_button = ui.Button(
+            self.__screen, 800, 150, 200, 100, self.font, "open", self.__open_video
+        )
         self.__play_button = ui.Button(
             self.__screen, 800, 30, 200, 100, self.font, "play", self.__video_frame.play
         )
@@ -88,19 +89,27 @@ class VideoPlayer:
     def __update(self):
         self.__screen.fill(self.background_color)
 
-        text_surface = self.font.render(
-            "{:.2f} / {:.2f}".format(
-                self.__video_frame.current_time, self.__video_frame.duration
-            ),
-            True,
-            (255, 255, 255),
+        self.__progress_text.text = "{:.2f} / {:.2f}".format(
+            self.__video_frame.current_time, self.__video_frame.duration
         )
-        self.__screen.blit(text_surface, (10, 10))
 
         ui.UIElement.update_all()
         pygame.display.update()
 
         self.clock.tick(self.__video_frame.fps)
+
+    # open a video
+    def __open_video(self):
+        self.__video_path = filedialog.askopenfilename(
+            initialdir=".",
+            title="Select a mp4 file",
+            filetypes=(("MP4 files", "*.mp4"),),
+        )
+        if not self.__video_path:
+            return
+
+        self.__video_frame.load_video(self.__video_path)
+        self.__process_video()
 
     # process current video
     # TODO: better interactivity

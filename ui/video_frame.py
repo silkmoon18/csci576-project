@@ -10,7 +10,6 @@ class VideoFrame(UIElement):
         self.__capture: cv2.VideoCapture = None
         self.load_video(video_path)
         super().__init__(screen, x, y, self.width, self.height)
-        self.__next()
         self.__playing = False
 
     @property
@@ -58,6 +57,8 @@ class VideoFrame(UIElement):
             )
         else:
             self.__duration = 0
+        
+        self.__next()
 
     # jump to the specified time in seconds
     def jump_to(self, time: float) -> None:
