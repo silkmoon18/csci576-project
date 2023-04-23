@@ -35,15 +35,8 @@ class Button(UIElement):
         self._surface.fill(self.color_normal)
 
         # check if mouse is hovering
-        x, y = self._x, self._y
-        if self._parent:
-            x += self._parent._x
-            y += self._parent._y
-
-        click_area = pygame.Rect(x, y, self._width, self._height)
-
         mouse_position = pygame.mouse.get_pos()
-        if self.visible and click_area.collidepoint(mouse_position):
+        if self.visible and self.get_active_area().collidepoint(mouse_position):
             # fill hover color
             self._surface.fill(self.color_hover)
 

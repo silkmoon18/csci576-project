@@ -60,7 +60,7 @@ class VideoPlayer:
 
         self.__buttons_scroll_view = ui.ScrollView(self.__screen, 10, 300, 400, 400)
         test_button = ui.Button(self.__screen, 50, 100, 200, 100, self.__font, "test")
-        self.__buttons_scroll_view.add(test_button)
+        test_button.parent = self.__buttons_scroll_view
 
         self.__open_button = ui.Button(
             self.__screen, 800, 150, 200, 100, self.__font, "open", self.__open_video

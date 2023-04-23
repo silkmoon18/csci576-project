@@ -33,6 +33,16 @@ class UIElement(ABC):
         self.visible = True
         UIElement.elements.append(self)
 
+    # get the rect in world space
+    @property
+    def world_rect(self) -> pygame.Rect:
+        x, y = self._x, self._y
+        if self._parent:
+            parent_rect = self._parent.world_rect
+            x += parent_rect.x
+            y += parent_rect.y
+        return pygame.Rect(x, y, self._width, self._height)
+
     @property
     def parent(self) -> UIElement:
         return self._parent
@@ -47,6 +57,13 @@ class UIElement(ABC):
         self._parent = value
         if value:
             value._children.append(self)
+
+    # get the active area in world space
+    def get_active_area(self) -> pygame.Rect:
+        area = self.world_rect
+        if self._parent:
+            area = area.clip(self._parent.get_active_area())
+        return area
 
     # update the element and its children once per frame
     def _update(self) -> None:
