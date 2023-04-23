@@ -28,15 +28,22 @@ class Button(UIElement):
 
         self.text = font.render(button_text, True, (20, 20, 20))
 
-        self.pressed = False
+        self.__pressed = False
 
     def _on_update(self) -> None:
         # fill normal color
         self._surface.fill(self.color_normal)
 
         # check if mouse is hovering
-        mousePos = pygame.mouse.get_pos()
-        if self.visible and self._rect.collidepoint(mousePos):
+        x, y = self._x, self._y
+        if self._parent:
+            x += self._parent._x
+            y += self._parent._y
+
+        click_area = pygame.Rect(x, y, self._width, self._height)
+
+        mouse_position = pygame.mouse.get_pos()
+        if self.visible and click_area.collidepoint(mouse_position):
             # fill hover color
             self._surface.fill(self.color_hover)
 
@@ -46,11 +53,11 @@ class Button(UIElement):
                 self._surface.fill(self.color_pressed)
 
                 # call onclick function if the button is not pressed yet
-                if self.on_click and not self.pressed:
-                    self.pressed = True
+                if self.on_click and not self.__pressed:
+                    self.__pressed = True
                     self.on_click()
             else:
-                self.pressed = False
+                self.__pressed = False
 
         # draw text
         self._surface.blit(

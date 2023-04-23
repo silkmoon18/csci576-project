@@ -47,20 +47,31 @@ class VideoPlayer:
         pygame.init()
         pygame.display.set_caption(self.title)
         self.__screen = pygame.display.set_mode((self.window_width, self.window_height))
-        self.clock = pygame.time.Clock()
-        self.font = pygame.font.SysFont(None, 24)
+        self.__clock = pygame.time.Clock()
+        self.__font = pygame.font.SysFont(None, 24)
 
     # initialize UI interface
     def __init_interface(self):
         # init ui elements
         self.__video_frame = ui.VideoFrame(self.__screen, 250, 0)
-        self.__progress_text = ui.Text(self.__screen, 10, 10, self.font)
+        self.__progress_text = ui.Text(self.__screen, 10, 10, self.__font)
+
+        self.__buttons_scroll_view = ui.ScrollView(self.__screen, 10, 300, 400, 400)
+        test_button = ui.Button(self.__screen, 50, 100, 200, 100, self.__font, "test")
+        self.__buttons_scroll_view.add(test_button)
 
         self.__open_button = ui.Button(
-            self.__screen, 800, 150, 200, 100, self.font, "open", self.__open_video
+            self.__screen, 800, 150, 200, 100, self.__font, "open", self.__open_video
         )
         self.__play_button = ui.Button(
-            self.__screen, 800, 30, 200, 100, self.font, "play", self.__video_frame.play
+            self.__screen,
+            800,
+            30,
+            200,
+            100,
+            self.__font,
+            "play",
+            self.__video_frame.play,
         )
         self.__pause_button = ui.Button(
             self.__screen,
@@ -68,7 +79,7 @@ class VideoPlayer:
             30,
             200,
             100,
-            self.font,
+            self.__font,
             "pause",
             self.__video_frame.pause,
         )
@@ -78,7 +89,7 @@ class VideoPlayer:
             30,
             200,
             100,
-            self.font,
+            self.__font,
             "stop",
             self.__video_frame.stop,
         )
@@ -88,11 +99,22 @@ class VideoPlayer:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.__running = False
+
+            # keyboard events
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     self.__video_frame.toggle()
                 elif event.key == pygame.K_ESCAPE:
                     self.__running = False
+
+            # mouse events
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # scroll up
+                if event.button == 4:
+                    self.__buttons_scroll_view.scroll(False)
+                # scroll down
+                elif event.button == 5:
+                    self.__buttons_scroll_view.scroll(True)
 
     def __update(self):
         self.__screen.fill(self.background_color)
@@ -104,7 +126,8 @@ class VideoPlayer:
         ui.UIElement.update_all()
         pygame.display.update()
 
-        self.clock.tick(self.__video_frame.fps)
+        self.__clock.tick(self.__video_frame.fps)
+        print(self.__clock.get_fps())
 
     # open a video
     def __open_video(self):
@@ -117,7 +140,7 @@ class VideoPlayer:
             return
 
         self.__video_frame.load_video(self.__video_path)
-        self.__process_video()
+        # self.__process_video()
 
     # process current video
     # TODO: better interactivity

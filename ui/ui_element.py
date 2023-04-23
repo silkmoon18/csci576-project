@@ -13,20 +13,20 @@ class UIElement(ABC):
         for element in UIElement.elements:
             if element._parent:
                 continue
-            element.__update()
+            element._update()
 
     # initialize an element with a target surface, position, and dimension
     def __init__(
         self, screen: pygame.Surface, x: int, y: int, width: int, height: int
     ) -> None:
-        self.screen = screen
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
+        self._screen = screen
+        self._x = x
+        self._y = y
+        self._width = width
+        self._height = height
 
-        self._surface = pygame.Surface((self.width, self.height))
-        self._rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self._surface = pygame.Surface((self._width, self._height))
+        self._rect = pygame.Rect(0, 0, self._width, self._height)
         self._children: list[UIElement] = []
         self._parent = None
 
@@ -49,18 +49,22 @@ class UIElement(ABC):
             value._children.append(self)
 
     # update the element and its children once per frame
-    def __update(self) -> None:
+    def _update(self) -> None:
         self._on_update()
-        self.__draw()
         for child in self._children:
             child._on_update()
-            child.__draw()
+            child._draw()
+        self._draw()
 
     # draw the element to the screen
-    def __draw(self) -> None:
+    def _draw(self) -> None:
         if not self.visible:
             return
-        self.screen.blit(self._surface, self._rect)
+
+        surface = self._screen
+        if self._parent:
+            surface = self._parent._surface
+        surface.blit(self._surface, (self._x, self._y), self._rect)
 
     # called on update
     @abstractmethod

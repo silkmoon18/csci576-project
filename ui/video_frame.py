@@ -10,7 +10,7 @@ class VideoFrame(UIElement):
         self.__frame = None
         self.__capture: cv2.VideoCapture = None
         self.load_video(video_path)
-        super().__init__(screen, x, y, self.width, self.height)
+        super().__init__(screen, x, y, self._width, self._height)
         self.__playing = False
 
     @property
@@ -50,18 +50,19 @@ class VideoFrame(UIElement):
         if video_path:
             self.__capture = cv2.VideoCapture(video_path)
             self.__fps = int(self.__capture.get(cv2.CAP_PROP_FPS))
-            self.width = int(self.__capture.get(cv2.CAP_PROP_FRAME_WIDTH))
-            self.height = int(self.__capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            self._width = int(self.__capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+            self._height = int(self.__capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
             self.__duration = int(
                 self.__capture.get(cv2.CAP_PROP_FRAME_COUNT) / self.__fps
             )
         else:
             self.__capture = None
             self.__fps = 0
-            self.width = 0
-            self.height = 0
+            self._width = 0
+            self._height = 0
             self.__duration = 0
 
+        self._rect = pygame.Rect(0, 0, self._width, self._height)
         self.__current_time = 0
         self.__next()
 
