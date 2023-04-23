@@ -36,7 +36,7 @@ class Text(UIElement):
         self.__font = value
         self.__refresh_style()
 
-    def __refresh_style(self):
+    def __refresh_style(self) -> None:
         self._surface = self.font.render(
             self.__text, True, self.text_color, self.background_color
         )

@@ -13,6 +13,7 @@ class VideoPlayer:
         background_color: str = "#000000",
         scene_threshold: float = 40,
         shot_threshold: float = 27,
+        program_fps: int = 60,
     ):
         self.title = title
         self.window_width = window_width
@@ -20,6 +21,7 @@ class VideoPlayer:
         self.background_color = background_color
         self.__scene_threshold = scene_threshold
         self.__shot_threshold = shot_threshold
+        self.__program_fps = program_fps
 
         self.__running = True
 
@@ -126,8 +128,7 @@ class VideoPlayer:
         ui.UIElement.update_all()
         pygame.display.update()
 
-        self.__clock.tick(self.__video_frame.fps)
-        print(self.__clock.get_fps())
+        self.__clock.tick(self.__program_fps)
 
     # open a video
     def __open_video(self):
@@ -140,6 +141,7 @@ class VideoPlayer:
             return
 
         self.__video_frame.load_video(self.__video_path)
+        self.__video_frame.set_interval(self.__program_fps)
         # self.__process_video()
 
     # process current video

@@ -4,13 +4,17 @@ import cv2
 
 # frame that displays a video
 class VideoFrame(UIElement):
-    def __init__(
-        self, screen: pygame.Surface, x: int, y: int, video_path: str = None
-    ) -> None:
+    def __init__(self, screen: pygame.Surface, x: int, y: int) -> None:
+        super().__init__(screen, x, y, 0, 0)
+
         self.__frame = None
         self.__capture: cv2.VideoCapture = None
-        self.load_video(video_path)
-        super().__init__(screen, x, y, self._width, self._height)
+        self.__fps = 0
+        self.__duration = 0
+        self.__current_time = 0
+
+        self.__update_interval = 0
+        self.__frame_count = 0
         self.__playing = False
 
     @property
@@ -41,6 +45,15 @@ class VideoFrame(UIElement):
     def stop(self) -> None:
         self.__playing = False
         self.jump_to(0)
+
+    # set the update interval based on program fps
+    def set_interval(self, program_fps: int) -> None:
+        if not self.__capture:
+            return
+
+        video_fps = int(self.__capture.get(cv2.CAP_PROP_FPS))
+        self.__update_interval = max(1, program_fps / video_fps)
+        self.__frame_count = 0
 
     # load a video from the specified path
     def load_video(self, video_path: str = None) -> None:
@@ -75,12 +88,22 @@ class VideoFrame(UIElement):
         self.__next()
 
     def _on_update(self) -> None:
+        # if video is playing
         if self.__playing:
-            updated = self.__next()
-            self.__current_time += 1 / self.__fps
-            if not updated:
-                self.__playing = False
+            # increment counter
+            self.__frame_count += 1
 
+            # if counter reached the interval to update
+            if self.__frame_count >= self.__update_interval:
+                self.__frame_count = 0
+
+                # try update video frame
+                updated = self.__next()
+                self.__current_time += 1 / self.__fps
+                if not updated:
+                    self.__playing = False
+
+        # always display a frame
         if self.__frame is not None:
             self._surface = pygame.surfarray.make_surface(self.__frame)
 
