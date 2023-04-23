@@ -1,6 +1,6 @@
-from tkinter import filedialog
 import pygame
 import ui
+from tkinter import Tk, filedialog
 from scenedetect import detect, AdaptiveDetector, FrameTimecode
 
 
@@ -45,6 +45,11 @@ class VideoPlayer:
 
     # initialize UI interface
     def __init_interface(self):
+        # init and hide tkinter root
+        self.__tk = Tk()
+        self.__tk.withdraw()
+
+        # init ui elements
         self.__video_frame = ui.VideoFrame(self.__screen, 250, 0)
         self.__progress_text = ui.Text(self.__screen, 10, 10, self.font)
 
