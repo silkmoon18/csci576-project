@@ -81,7 +81,7 @@ class VideoPlayer:
                 self.__running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    self.__paused = not self.__paused
+                    self.__video_frame.toggle()
                 elif event.key == pygame.K_ESCAPE:
                     self.__running = False
 

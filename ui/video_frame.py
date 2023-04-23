@@ -25,6 +25,10 @@ class VideoFrame(UIElement):
     def current_time(self) -> int:
         return self.__current_time
 
+    # toggle playing state
+    def toggle(self) -> None:
+        self.__playing = not self.__playing
+
     # play the video
     def play(self) -> None:
         self.__playing = True
