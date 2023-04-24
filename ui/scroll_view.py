@@ -57,7 +57,6 @@ class ScrollBar(UIElement):
     def __init__(
         self,
         screen: pygame.Surface,
-        content: ContentView,
         scroll_view_width: int,
         scroll_view_height: int,
         width: int = 10,
@@ -73,28 +72,23 @@ class ScrollBar(UIElement):
             scroll_view_height,
             color_normal,
         )
-        self.__content = content
         self.color_hover = color_hover
-        self.color_pressed = color_pressed
+        self.color_dragging = color_pressed
 
         self.__dragging = False
-        self.__previous_position = 0
+
+    @property
+    def dragging(self)->bool:
+        return self.__dragging
 
     # override
     def _on_update(self) -> None:
         mouse_position = pygame.mouse.get_pos()
 
-        # if the bar is being dragged, move content
+        # if the bar is being dragged
         if self.__dragging and pygame.mouse.get_pressed()[0]:
-            self._surface.fill(self.color_pressed)
-            step = (
-                (mouse_position[1] - self.__previous_position)
-                / self._parent.height
-                * self.__content.get_length()
-            )
-            self.__content.move(step)
-            self.y = self.__content.get_progress() * self._parent.height
-            self.__previous_position = mouse_position[1]
+            # fill dragging color
+            self._surface.fill(self.color_dragging)
             return
 
         self.__dragging = False
@@ -106,11 +100,10 @@ class ScrollBar(UIElement):
             # check if left mouse is pressed
             if pygame.mouse.get_pressed()[0]:
                 # fill pressed color
-                self._surface.fill(self.color_pressed)
+                self._surface.fill(self.color_dragging)
 
                 # start dragging
                 self.__dragging = True
-                self.__previous_position = mouse_position[1]
 
 
 # vertical scroll view
@@ -133,8 +126,9 @@ class ScrollView(UIElement):
         )
         self.__content.parent = self
 
-        self.__scroll_bar = ScrollBar(screen, self.__content, width, height)
+        self.__scroll_bar = ScrollBar(screen, width, height)
         self.__scroll_bar.parent = self
+        self.__previous_mouse_position = 0 # for calculating mouse delta position
 
     # add a UI element to the content
     def add_to_content(self, element: UIElement) -> None:
@@ -147,6 +141,11 @@ class ScrollView(UIElement):
 
     # scroll the content up or down
     def scroll(self, direction_down: bool) -> None:
+        # scroll only when mouse is on the area
+        mouse_position = pygame.mouse.get_pos()
+        if not self.visible or not self.get_active_area().collidepoint(mouse_position):
+            return
+
         step = -self.speed if direction_down else self.speed
         self.__content.move(step)
 
@@ -155,4 +154,16 @@ class ScrollView(UIElement):
 
     # override
     def _on_update(self) -> None:
-        return
+        mouse_position = pygame.mouse.get_pos()
+
+        # if is dragging scroll bar, move content
+        if self.__scroll_bar.dragging:
+            step = (
+                (mouse_position[1] - self.__previous_mouse_position)
+                * self.__content.get_length()
+                / self.height
+            )
+            self.__content.move(step)
+            self.__scroll_bar.y = self.__content.get_progress() * self.height
+            
+        self.__previous_mouse_position = mouse_position[1]
