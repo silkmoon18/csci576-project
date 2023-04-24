@@ -189,7 +189,7 @@ class VideoPlayer:
             shot_buttons = self.__make_shot_buttons(scene_button, scene)
             if len(shot_buttons) > 0:
                 last = shot_buttons[-1]
-                y = last.y + last.size[1]
+                y = last.y + last.height
             else:
                 y = scene_button.y + height
             y += margin_y
@@ -220,8 +220,8 @@ class VideoPlayer:
         )
 
         start_position = (
-            scene_button.x + scene_button.size[0] + margin_x,
-            scene_button.y + scene_button.size[1] + margin_y,
+            scene_button.x + scene_button.width + margin_x,
+            scene_button.y + scene_button.height + margin_y,
         )
         for i, shot in enumerate(shots):
             time = shot[0].get_seconds()

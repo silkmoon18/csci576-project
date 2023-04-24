@@ -17,17 +17,23 @@ class UIElement(ABC):
 
     # initialize an element with a target surface, position, and dimension
     def __init__(
-        self, screen: pygame.Surface, x: int, y: int, width: int, height: int, background_color:str = None
+        self,
+        screen: pygame.Surface,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        background_color: str = None,
     ) -> None:
         self._screen = screen
         self.x = x
         self.y = y
-        self._width = width
-        self._height = height
+        self.__width = width
+        self.__height = height
         self.background_color = background_color
 
-        self._surface = pygame.Surface((self._width, self._height))
-        self._rect = pygame.Rect(0, 0, self._width, self._height)
+        self._surface = pygame.Surface((self.__width, self.__height))
+        self._rect = pygame.Rect(0, 0, self.__width, self.__height)
         self._children: list[UIElement] = []
         self._parent = None
 
@@ -35,8 +41,28 @@ class UIElement(ABC):
         UIElement.elements.append(self)
 
     @property
-    def size(self) -> tuple[int, int]:
-        return (self._width, self._height)
+    def width(self) -> int:
+        return self.__width
+
+    @width.setter
+    def width(self, value: int) -> None:
+        self.__width = value
+        self._surface = pygame.Surface((self.__width, self.__height))
+        self._rect = pygame.Rect(
+            self._rect.x, self._rect.y, self.__width, self.__height
+        )
+
+    @property
+    def height(self) -> int:
+        return self.__height
+
+    @height.setter
+    def height(self, value: int) -> None:
+        self.__height = value
+        self._surface = pygame.Surface((self.__width, self.__height))
+        self._rect = pygame.Rect(
+            self._rect.x, self._rect.y, self.__width, self.__height
+        )
 
     # get the rect in world space
     @property
@@ -46,7 +72,7 @@ class UIElement(ABC):
             parent_rect = self._parent.world_rect
             x += parent_rect.x
             y += parent_rect.y
-        return pygame.Rect(x, y, self._width, self._height)
+        return pygame.Rect(x, y, self.__width, self.__height)
 
     @property
     def parent(self) -> UIElement:
@@ -73,6 +99,7 @@ class UIElement(ABC):
 
     # update the element and its children once per frame
     def __update(self) -> None:
+        # if background color is not None, fill the surface
         if self.background_color:
             self._surface.fill(self.background_color)
 
@@ -86,7 +113,10 @@ class UIElement(ABC):
         if not self.visible:
             return
 
+        # draw on the screen
         surface = self._screen
+
+        # if parent exists, draw on the parent's surface
         if self._parent:
             surface = self._parent._surface
         surface.blit(self._surface, (self.x, self.y), self._rect)

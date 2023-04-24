@@ -53,7 +53,7 @@ class Button(UIElement):
         self._surface.blit(
             self.text,
             [
-                self._width / 2 - self.text.get_rect().width / 2,
-                self._height / 2 - self.text.get_rect().height / 2,
+                self.width / 2 - self.text.get_rect().width / 2,
+                self.height / 2 - self.text.get_rect().height / 2,
             ],
         )
