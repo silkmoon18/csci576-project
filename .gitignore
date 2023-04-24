@@ -1,6 +1,9 @@
 # mp4 files
 /data
 
+# test files
+test.py
+
 # vs-code configs
 .vscode
 
@@ -54,3 +57,5 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+.DS_Store

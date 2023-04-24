@@ -16,4 +16,4 @@ class Canvas(UIElement):
         self.color = color
 
     def _on_update(self) -> None:
-        self.screen.fill(self.color)
+        self._screen.fill(self.color)

@@ -23,8 +23,8 @@ if __name__ == "__main__":
         title,
         window_width,
         window_height,
-        background_color,
         scene_threshold,
         shot_threshold,
+        background_color,
     )
     player.start()
