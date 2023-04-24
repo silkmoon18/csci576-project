@@ -18,11 +18,10 @@ class Button(UIElement):
         color_hover: str = "#DADDD8",
         color_pressed: str = "#1C1C1C",
     ) -> None:
-        super().__init__(screen, x, y, width, height)
+        super().__init__(screen, x, y, width, height, color_normal)
 
         self.on_click = on_click
 
-        self.color_normal = color_normal
         self.color_hover = color_hover
         self.color_pressed = color_pressed
 
@@ -32,9 +31,6 @@ class Button(UIElement):
 
     # override
     def _on_update(self) -> None:
-        # fill normal color
-        self._surface.fill(self.color_normal)
-
         # check if mouse is hovering
         mouse_position = pygame.mouse.get_pos()
         if self.visible and self.get_active_area().collidepoint(mouse_position):

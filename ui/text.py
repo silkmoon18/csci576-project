@@ -12,11 +12,10 @@ class Text(UIElement):
         text_color: str = "#ffffff",
         background_color: str = None,
     ) -> None:
-        super().__init__(screen, x, y, 0, 0)
+        super().__init__(screen, x, y, 0, 0, background_color)
         self.__font = font
         self.__text = text
         self.text_color = text_color
-        self.background_color = background_color
 
     @property
     def text(self) -> str:

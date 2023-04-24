@@ -58,7 +58,9 @@ class VideoPlayer:
         self.__video_frame = ui.VideoFrame(self.__screen, 250, 0)
         self.__progress_text = ui.Text(self.__screen, 10, 10, self.__font)
 
-        self.__buttons_scroll_view = ui.ScrollView(self.__screen, 10, 300, 400, 400, background_color="#C2E7D9")
+        self.__buttons_scroll_view = ui.ScrollView(
+            self.__screen, 10, 300, 400, 400, content_background_color="#C2E7D9"
+        )
 
         self.__open_button = ui.Button(
             self.__screen, 800, 150, 200, 100, self.__font, "open", self.__open_video
@@ -181,7 +183,7 @@ class VideoPlayer:
                 "scene_" + str(i + 1),
                 lambda t=time: self.__video_frame.jump_to(t),
             )
-            scene_button.parent = self.__buttons_scroll_view
+            self.__buttons_scroll_view.add_to_content(scene_button)
             scene_buttons.append(scene_button)
 
             shot_buttons = self.__make_shot_buttons(scene_button, scene)
@@ -233,6 +235,6 @@ class VideoPlayer:
                 "shot_" + str(i + 1),
                 lambda t=time: self.__video_frame.jump_to(t),
             )
-            button.parent = self.__buttons_scroll_view
+            self.__buttons_scroll_view.add_to_content(button)
             buttons.append(button)
         return buttons
