@@ -143,6 +143,7 @@ class VideoPlayer:
         if not self.__video_path:
             return
 
+        self.__buttons_scroll_view.clear_content()
         self.__video_frame.load_video(self.__video_path)
         self.__video_frame.set_interval(self.__program_fps)
         self.__process_video()

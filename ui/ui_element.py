@@ -97,6 +97,21 @@ class UIElement(ABC):
             area = area.clip(self._parent.get_active_area())
         return area
 
+    # delete this element and all its children
+    def delete(self) -> None:
+        self.delete_all_children()
+        self.background_color = None
+        self._surface = None
+        self._rect = None
+        self.parent = None
+        self.visible = False
+        UIElement.elements.remove(self)
+
+    # delete all children
+    def delete_all_children(self) -> None:
+        while self._children:
+            self._children[-1].delete()
+
     # update the element and its children once per frame
     def __update(self) -> None:
         # if background color is not None, fill the surface

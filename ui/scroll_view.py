@@ -41,6 +41,12 @@ class ContentView(UIElement):
     # get the length of content
     def get_length(self) -> int:
         return self.__last_position
+    
+    # clear all content elements
+    def clear(self)->None:
+        self.delete_all_children()
+        self.__current_position = 0
+        self.__last_position = 0
 
     # override
     def _on_update(self) -> None:
@@ -139,6 +145,12 @@ class ScrollView(UIElement):
             self.height / self.__content.get_length() * self.height
         )
 
+    # clear content
+    def clear_content(self) -> None:
+        self.__content.clear()
+        self.__scroll_bar.y = 0
+        self.__scroll_bar.height = self.height
+
     # scroll the content up or down
     def scroll(self, direction_down: bool) -> None:
         # scroll only when mouse is on the area
@@ -165,5 +177,5 @@ class ScrollView(UIElement):
             )
             self.__content.move(step)
             self.__scroll_bar.y = self.__content.get_progress() * self.height
-            
+
         self.__previous_mouse_position = mouse_position[1]
