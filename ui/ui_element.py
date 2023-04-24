@@ -20,8 +20,8 @@ class UIElement(ABC):
         self, screen: pygame.Surface, x: int, y: int, width: int, height: int
     ) -> None:
         self._screen = screen
-        self._x = x
-        self._y = y
+        self.x = x
+        self.y = y
         self._width = width
         self._height = height
 
@@ -33,10 +33,14 @@ class UIElement(ABC):
         self.visible = True
         UIElement.elements.append(self)
 
+    @property
+    def size(self) -> tuple[int, int]:
+        return (self._width, self._height)
+
     # get the rect in world space
     @property
     def world_rect(self) -> pygame.Rect:
-        x, y = self._x, self._y
+        x, y = self.x, self.y
         if self._parent:
             parent_rect = self._parent.world_rect
             x += parent_rect.x
@@ -57,6 +61,7 @@ class UIElement(ABC):
         self._parent = value
         if value:
             value._children.append(self)
+            value._on_child_added()
 
     # get the active area in world space
     def get_active_area(self) -> pygame.Rect:
@@ -81,9 +86,13 @@ class UIElement(ABC):
         surface = self._screen
         if self._parent:
             surface = self._parent._surface
-        surface.blit(self._surface, (self._x, self._y), self._rect)
+        surface.blit(self._surface, (self.x, self.y), self._rect)
 
     # called on update
     @abstractmethod
     def _on_update(self) -> None:
+        pass
+
+    # called when a new child is added
+    def _on_child_added(self) -> None:
         pass

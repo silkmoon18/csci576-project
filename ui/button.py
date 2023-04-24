@@ -30,6 +30,7 @@ class Button(UIElement):
 
         self.__pressed = False
 
+    # override
     def _on_update(self) -> None:
         # fill normal color
         self._surface.fill(self.color_normal)
@@ -56,7 +57,7 @@ class Button(UIElement):
         self._surface.blit(
             self.text,
             [
-                self._rect.width / 2 - self.text.get_rect().width / 2,
-                self._rect.height / 2 - self.text.get_rect().height / 2,
+                self._width / 2 - self.text.get_rect().width / 2,
+                self._height / 2 - self.text.get_rect().height / 2,
             ],
         )

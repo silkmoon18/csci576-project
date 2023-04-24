@@ -19,23 +19,24 @@ class Text(UIElement):
         self.background_color = background_color
 
     @property
-    def text(self):
+    def text(self) -> str:
         return self.__text
 
     @text.setter
-    def text(self, value):
+    def text(self, value) -> None:
         self.__text = value
         self.__refresh_style()
 
     @property
-    def font(self):
+    def font(self) -> pygame.font:
         return self.__font
 
     @font.setter
-    def font(self, value):
+    def font(self, value) -> None:
         self.__font = value
         self.__refresh_style()
 
+    # refresh text style
     def __refresh_style(self) -> None:
         self._surface = self.font.render(
             self.__text, True, self.text_color, self.background_color
@@ -43,5 +44,6 @@ class Text(UIElement):
         self._width, self._height = self._surface.get_size()
         self._rect = pygame.Rect(0, 0, self._width, self._height)
 
+    # override
     def _on_update(self) -> None:
         return

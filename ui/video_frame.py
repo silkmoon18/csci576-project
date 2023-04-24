@@ -87,6 +87,7 @@ class VideoFrame(UIElement):
         )
         self.__next()
 
+    # override
     def _on_update(self) -> None:
         # if video is playing
         if self.__playing:
