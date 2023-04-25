@@ -47,10 +47,7 @@ class UIElement(ABC):
     @width.setter
     def width(self, value: int) -> None:
         self.__width = value
-        self._surface = pygame.Surface((self.__width, self.__height))
-        self._rect = pygame.Rect(
-            self._rect.x, self._rect.y, self.__width, self.__height
-        )
+        self.__refresh_size()
 
     @property
     def height(self) -> int:
@@ -59,10 +56,17 @@ class UIElement(ABC):
     @height.setter
     def height(self, value: int) -> None:
         self.__height = value
-        self._surface = pygame.Surface((self.__width, self.__height))
-        self._rect = pygame.Rect(
-            self._rect.x, self._rect.y, self.__width, self.__height
-        )
+        self.__refresh_size()
+
+    @property
+    def size(self) -> tuple[int, int]:
+        return (self.__width, self.__height)
+
+    @size.setter
+    def size(self, value: tuple[int, int]) -> None:
+        self.__width = value[0]
+        self.__height = value[1]
+        self.__refresh_size()
 
     # get the rect in world space
     @property
@@ -136,6 +140,14 @@ class UIElement(ABC):
             surface = self._parent._surface
         surface.blit(self._surface, (self.x, self.y), self._rect)
 
+    # refresh the sizes of surface and rect
+    def __refresh_size(self) -> None:
+        self._surface = pygame.Surface((self.__width, self.__height))
+        self._rect = pygame.Rect(
+            self._rect.x, self._rect.y, self.__width, self.__height
+        )
+        self._on_size_changed()
+
     # called on update
     @abstractmethod
     def _on_update(self) -> None:
@@ -143,4 +155,8 @@ class UIElement(ABC):
 
     # called when a new child is added
     def _on_child_added(self) -> None:
+        pass
+
+    # called when the size is changed
+    def _on_size_changed(self) -> None:
         pass

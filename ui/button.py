@@ -1,4 +1,6 @@
 from .ui_element import *
+from ui.text import Text
+from ui.image import Image
 from typing import Callable
 
 
@@ -11,8 +13,6 @@ class Button(UIElement):
         y: int,
         width: int,
         height: int,
-        font: pygame.font,
-        button_text: str = "Button",
         on_click: Callable = None,
         color_normal: str = "#ffffff",
         color_hover: str = "#DADDD8",
@@ -25,9 +25,26 @@ class Button(UIElement):
         self.color_hover = color_hover
         self.color_pressed = color_pressed
 
-        self.text = font.render(button_text, True, (20, 20, 20))
-
         self.__pressed = False
+
+        self.__text = Text(self._screen, 0, 0)
+        self.__text.parent = self
+
+        image_size = min(width, height)
+        self.__image = Image(self._screen, 0, 0, image_size, image_size)
+        self.__image.parent = self
+
+    # set text
+    def set_text(
+        self, font: pygame.font.Font, text: str = "Button", text_color: str = "#0000ff"
+    ) -> None:
+        self.__text.font = font
+        self.__text.text = text
+        self.__text.text_color = text_color
+
+    # set image
+    def set_image(self, image_path: str) -> None:
+        self.__image.load_image(image_path)
 
     # override
     def _on_update(self) -> None:
@@ -50,10 +67,5 @@ class Button(UIElement):
                 self.__pressed = False
 
         # draw text
-        self._surface.blit(
-            self.text,
-            [
-                self.width / 2 - self.text.get_rect().width / 2,
-                self.height / 2 - self.text.get_rect().height / 2,
-            ],
-        )
+        self.__text.x = self.width / 2 - self.__text.width / 2
+        self.__text.y = self.height / 2 - self.__text.height / 2

@@ -4,11 +4,14 @@ import cv2
 
 # frame that displays a video
 class VideoFrame(UIElement):
-    def __init__(self, screen: pygame.Surface, x: int, y: int) -> None:
-        super().__init__(screen, x, y, 0, 0)
+    def __init__(
+        self, screen: pygame.Surface, x: int, y: int, width: int, height: int
+    ) -> None:
+        super().__init__(screen, x, y, width, height)
 
         self.__frame = None
         self.__capture: cv2.VideoCapture = None
+        self.__raw_width, self.__raw_height = 0, 0
         self.__fps = 0
         self.__duration = 0
         self.__current_time = 0
@@ -63,16 +66,16 @@ class VideoFrame(UIElement):
         if video_path:
             self.__capture = cv2.VideoCapture(video_path)
             self.__fps = int(self.__capture.get(cv2.CAP_PROP_FPS))
-            self.width = int(self.__capture.get(cv2.CAP_PROP_FRAME_WIDTH))
-            self.height = int(self.__capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            self.__raw_width = int(self.__capture.get(cv2.CAP_PROP_FRAME_WIDTH))
+            self.__raw_height = int(self.__capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
             self.__duration = int(
                 self.__capture.get(cv2.CAP_PROP_FRAME_COUNT) / self.__fps
             )
         else:
             self.__capture = None
             self.__fps = 0
-            self.width = 0
-            self.height = 0
+            self.__raw_width = 0
+            self.__raw_height = 0
             self.__duration = 0
 
         self.__current_time = 0
@@ -100,6 +103,7 @@ class VideoFrame(UIElement):
                 # try update video frame
                 updated = self.__next()
                 self.__current_time += 1 / self.__fps
+                self.__current_time = max(0, min(self.__duration, self.__current_time))
                 if not updated:
                     self.__playing = False
 
@@ -116,5 +120,6 @@ class VideoFrame(UIElement):
         if not success:
             return False
 
+        self.__frame = cv2.resize(self.__frame, (self.width, self.height))
         self.__frame = cv2.cvtColor(self.__frame, cv2.COLOR_BGR2RGB).swapaxes(0, 1)
         return True

@@ -55,7 +55,7 @@ class VideoPlayer:
     # initialize UI interface
     def __init_interface(self):
         # init ui elements
-        self.__video_frame = ui.VideoFrame(self.__screen, 250, 0)
+        self.__video_frame = ui.VideoFrame(self.__screen, 250, 0, 800, 600)
         self.__progress_text = ui.Text(self.__screen, 10, 10, self.__font)
 
         self.__buttons_scroll_view = ui.ScrollView(
@@ -63,38 +63,39 @@ class VideoPlayer:
         )
 
         self.__open_button = ui.Button(
-            self.__screen, 800, 150, 200, 100, self.__font, "open", self.__open_video
+            self.__screen, 800, 150, 200, 100, self.__open_video
         )
+        self.__open_button.set_image("sprites/open.png")
+
         self.__play_button = ui.Button(
             self.__screen,
             800,
             30,
             200,
             100,
-            self.__font,
-            "play",
             self.__video_frame.play,
         )
+        self.__play_button.set_image("sprites/play.png")
+
         self.__pause_button = ui.Button(
             self.__screen,
             1025,
             30,
             200,
             100,
-            self.__font,
-            "pause",
             self.__video_frame.pause,
         )
+        self.__pause_button.set_image("sprites/pause.png")
+
         self.__stop_button = ui.Button(
             self.__screen,
             1250,
             30,
             200,
             100,
-            self.__font,
-            "stop",
             self.__video_frame.stop,
         )
+        self.__stop_button.set_image("sprites/stop.png")
 
     # handle the player events
     def __handle_events(self):
