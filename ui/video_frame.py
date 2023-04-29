@@ -5,7 +5,7 @@ import cv2
 # frame that displays a video
 class VideoFrame(UIElement):
     def __init__(self, screen: pygame.Surface, x: int, y: int) -> None:
-        super().__init__(screen, x, y, 0, 0)
+        super().__init__(screen, x, y, 400, 300, background_color="#C2E7D9")
 
         self.__frame = None
         self.__capture: cv2.VideoCapture = None
@@ -35,10 +35,15 @@ class VideoFrame(UIElement):
 
     # play the video
     def play(self) -> None:
+        if self.__current_time > 0:
+            pygame.mixer.music.unpause()
+        else:
+            pygame.mixer.music.play()
         self.__playing = True
 
     # pause the video
     def pause(self) -> None:
+        pygame.mixer.music.pause()
         self.__playing = False
 
     # move to the beginning and pause the video
@@ -84,6 +89,10 @@ class VideoFrame(UIElement):
         self.__current_time = (
             int(self.__capture.get(cv2.CAP_PROP_POS_FRAMES)) / self.__fps
         )
+        if time == 0:
+            pygame.mixer.music.stop()
+        else:
+            pygame.mixer.music.play(0, time, 0)
         self.__next()
 
     # override

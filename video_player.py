@@ -1,3 +1,5 @@
+import os.path
+
 import pygame
 import ui
 from tkinter import Tk, filedialog
@@ -12,7 +14,7 @@ class VideoPlayer:
         window_height: int,
         scene_threshold: float,
         shot_threshold: float,
-        background_color: str = "#000000",
+        background_color: str = "#C2E7D9",
         program_fps: int = 60,
     ):
         self.title = title
@@ -48,6 +50,15 @@ class VideoPlayer:
     def __init_pygame(self):
         pygame.init()
         pygame.display.set_caption(self.title)
+
+        sound_file = "data\InputAudio.wav"
+        sound = pygame.mixer.Sound(sound_file)
+        self.__sound_length = sound.get_length()
+
+        pygame.mixer.init()
+        pygame.mixer.music.load(sound_file)
+        pygame.mixer.music.set_volume(0.2)
+
         self.__screen = pygame.display.set_mode((self.window_width, self.window_height))
         self.__clock = pygame.time.Clock()
         self.__font = pygame.font.SysFont(None, 24)
@@ -59,38 +70,38 @@ class VideoPlayer:
         self.__progress_text = ui.Text(self.__screen, 10, 10, self.__font)
 
         self.__buttons_scroll_view = ui.ScrollView(
-            self.__screen, 10, 300, 400, 400, content_background_color="#C2E7D9"
+            self.__screen, self.window_width / 2 + 200, 80, 400, 400, content_background_color="#C2E7D9"
         )
 
         self.__open_button = ui.Button(
-            self.__screen, 800, 150, 200, 100, self.__font, "open", self.__open_video
+            self.__screen, 80, 400, 100, 60, self.__font, "open", self.__open_video
         )
         self.__play_button = ui.Button(
             self.__screen,
-            800,
-            30,
-            200,
+            250,
+            400,
             100,
+            60,
             self.__font,
             "play",
             self.__video_frame.play,
         )
         self.__pause_button = ui.Button(
             self.__screen,
-            1025,
-            30,
-            200,
+            400,
+            400,
             100,
+            60,
             self.__font,
             "pause",
             self.__video_frame.pause,
         )
         self.__stop_button = ui.Button(
             self.__screen,
-            1250,
-            30,
-            200,
+            550,
+            400,
             100,
+            60,
             self.__font,
             "stop",
             self.__video_frame.stop,
@@ -143,7 +154,9 @@ class VideoPlayer:
         if not self.__video_path:
             return
 
+        self.__movie_name = os.path.basename(self.__video_path)
         self.__buttons_scroll_view.clear_content()
+
         self.__video_frame.load_video(self.__video_path)
         self.__video_frame.set_interval(self.__program_fps)
         self.__process_video()
@@ -164,7 +177,7 @@ class VideoPlayer:
         self, scenes: list[tuple[FrameTimecode, FrameTimecode]]
     ) -> list[ui.Button]:
         font_size: int = 15
-        width: int = 40
+        width: int = 80
         height: int = 20
         margin_x: int = 5
         margin_y: int = 5
@@ -172,6 +185,19 @@ class VideoPlayer:
         scene_buttons = []
 
         y = margin_y
+        movie_text = ui.Button(
+            self.__screen,
+            margin_x,
+            y,
+            200,
+            height,
+            pygame.font.SysFont(None, font_size),
+            "Movie: " + self.__movie_name
+        )
+        self.__buttons_scroll_view.add_to_content(movie_text)
+
+        y += 40
+
         for i, scene in enumerate(scenes):
             time = scene[0].get_seconds()
             scene_button = ui.Button(
@@ -204,7 +230,7 @@ class VideoPlayer:
         scene_button: ui.Button,
         scene: tuple[FrameTimecode, FrameTimecode],
         font_size: int = 15,
-        width: int = 40,
+        width: int = 80,
         height: int = 20,
         margin_x: int = 5,
         margin_y: int = 5,
