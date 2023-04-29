@@ -194,9 +194,7 @@ class VideoPlayer:
             else:
                 y = scene_button.y + height
             y += margin_y
-
             scene_buttons.extend(shot_buttons)
-
         return scene_buttons
 
     # make index buttons for shots
@@ -224,18 +222,33 @@ class VideoPlayer:
             scene_button.x + scene_button.width + margin_x,
             scene_button.y + scene_button.height + margin_y,
         )
-        for i, shot in enumerate(shots):
-            time = shot[0].get_seconds()
-            button = ui.Button(
+        if(shots.__len__()==0):
+            time = scene[0].get_seconds()
+            button = button = ui.Button(
                 self.__screen,
                 start_position[0],
-                start_position[1] + i * (height + margin_y),
+                start_position[1],
                 width,
                 height,
                 pygame.font.SysFont(None, font_size),
-                "shot_" + str(i + 1),
+                "shot_1",
                 lambda t=time: self.__video_frame.jump_to(t),
             )
             self.__buttons_scroll_view.add_to_content(button)
             buttons.append(button)
+        else:
+            for i, shot in enumerate(shots):
+                time = shot[0].get_seconds()
+                button = ui.Button(
+                    self.__screen,
+                    start_position[0],
+                    start_position[1] + i * (height + margin_y),
+                    width,
+                    height,
+                    pygame.font.SysFont(None, font_size),
+                    "shot_" + str(i + 1),
+                    lambda t=time: self.__video_frame.jump_to(t),
+                )
+                self.__buttons_scroll_view.add_to_content(button)
+                buttons.append(button)
         return buttons
