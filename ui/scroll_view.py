@@ -54,8 +54,9 @@ class ContentView(UIElement):
 
     # override
     def _on_child_added(self) -> None:
+        child = self._children[-1]
         # update the last position
-        self.__last_position = max(self.__last_position, self._children[-1].y)
+        self.__last_position = max(self.__last_position, child.y + child.height)
 
 
 # scroll bar for ScrollView
