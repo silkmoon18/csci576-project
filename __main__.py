@@ -12,6 +12,7 @@ background_color = "#000000"
 # adaptive threshold
 scene_threshold = 8
 shot_threshold = 6
+subshot_threshold = 4
 
 # test
 window_width = 1500
@@ -25,6 +26,7 @@ if __name__ == "__main__":
         window_height,
         scene_threshold,
         shot_threshold,
+        subshot_threshold,
         background_color,
     )
     player.start()

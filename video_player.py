@@ -14,6 +14,7 @@ class VideoPlayer:
         window_height: int,
         scene_threshold: float,
         shot_threshold: float,
+        subshot_threshold: float,
         background_color: str = "#C2E7D9",
         program_fps: int = 60,
     ):
@@ -23,6 +24,7 @@ class VideoPlayer:
         self.background_color = background_color
         self.__scene_threshold = scene_threshold
         self.__shot_threshold = shot_threshold
+        self.__subshot_threshold = subshot_threshold
         self.__program_fps = program_fps
 
         self.__running = True
@@ -85,6 +87,8 @@ class VideoPlayer:
             "play",
             self.__video_frame.play,
         )
+        self.__play_button.visible = False
+
         self.__pause_button = ui.Button(
             self.__screen,
             400,
@@ -95,6 +99,8 @@ class VideoPlayer:
             "pause",
             self.__video_frame.pause,
         )
+        self.__pause_button.visible = False
+        
         self.__stop_button = ui.Button(
             self.__screen,
             550,
@@ -105,7 +111,8 @@ class VideoPlayer:
             "stop",
             self.__video_frame.stop,
         )
-
+        self.__stop_button.visible = False
+        
     # handle the player events
     def __handle_events(self):
         for event in pygame.event.get():
@@ -170,6 +177,10 @@ class VideoPlayer:
         self.__video_frame.set_interval(self.__program_fps)
         self.__process_video()
 
+        self.__play_button.visible = True
+        self.__pause_button.visible = True
+        self.__stop_button.visible = True
+
     # process current video
     # TODO: better interactivity
     def __process_video(self):
@@ -209,14 +220,13 @@ class VideoPlayer:
             self.__buttons_scroll_view.add_to_content(scene_button)
             scene_buttons.append(scene_button)
 
-            shot_buttons = self.__make_shot_buttons(scene_button, scene)
-            if len(shot_buttons) > 0:
-                last = shot_buttons[-1]
-                y = last.y + last.height
+            last_position = self.__make_shot_buttons(scene_button, scene)
+            if last_position > 0:
+                y = last_position
             else:
                 y = scene_button.y + height
             y += margin_y
-            scene_buttons.extend(shot_buttons)
+            # scene_buttons.extend(shot_buttons)
         return scene_buttons
 
     # make index buttons for shots
@@ -230,11 +240,15 @@ class VideoPlayer:
         height: int = 20,
         margin_x: int = 5,
         margin_y: int = 5,
+        subshot: bool = False
     ) -> list[ui.Button]:
         buttons = []
+        last_position = 0
+
+        threshold = self.__shot_threshold if not subshot else self.__subshot_threshold
         shots = detect(
             self.__video_path,
-            AdaptiveDetector(adaptive_threshold=self.__shot_threshold),
+            AdaptiveDetector(adaptive_threshold=threshold),
             show_progress=True,
             start_time=scene[0].get_timecode(),
             end_time=scene[1].get_timecode(),
@@ -244,12 +258,14 @@ class VideoPlayer:
             scene_button.x + scene_button.width + margin_x,
             scene_button.y + scene_button.height + margin_y,
         )
-        if shots.__len__() == 0:
+        y = scene_button.y + scene_button.height + margin_y
+        if not subshot and shots.__len__() == 0:
             time = scene[0].get_seconds()
             button = button = ui.Button(
                 self.__screen,
                 start_position[0],
-                start_position[1],
+                # start_position[1],
+                y,
                 width,
                 height,
                 pygame.font.SysFont(None, font_size),
@@ -258,14 +274,14 @@ class VideoPlayer:
             )
             self.__buttons_scroll_view.add_to_content(button)
             buttons.append(button)
-            print("vp_" + str(button.y))
         else:
             for i, shot in enumerate(shots):
                 time = shot[0].get_seconds()
                 button = ui.Button(
                     self.__screen,
                     start_position[0],
-                    start_position[1] + i * (height + margin_y),
+                    y,
+                    # start_position[1] + i * (height + margin_y),
                     width,
                     height,
                     pygame.font.SysFont(None, font_size),
@@ -275,4 +291,24 @@ class VideoPlayer:
                 self.__buttons_scroll_view.add_to_content(button)
                 buttons.append(button)
 
-        return buttons
+                # subshot
+                l = 0
+                if len(buttons) > 1 and calculate_length(shot) > 15:
+                    l = self.__make_shot_buttons(button, shot, subshot=True)
+
+                if l > 0:
+                    last = l
+                    last_position = max(last_position, last)
+                    y = last_position
+                else:
+                    y = button.y + height
+                y += margin_y
+
+        if len(buttons) > 0:
+            last_position = max(last_position, buttons[-1].y + buttons[-1].height)
+
+        return last_position
+    
+    
+def calculate_length(time_code):
+    return time_code[1].get_seconds() - time_code[0].get_seconds()
