@@ -51,13 +51,7 @@ class VideoPlayer:
         pygame.init()
         pygame.display.set_caption(self.title)
 
-        sound_file = "data\InputAudio.wav"
-        sound = pygame.mixer.Sound(sound_file)
-        self.__sound_length = sound.get_length()
-
         pygame.mixer.init()
-        pygame.mixer.music.load(sound_file)
-        pygame.mixer.music.set_volume(0.2)
 
         self.__screen = pygame.display.set_mode((self.window_width, self.window_height))
         self.__clock = pygame.time.Clock()
@@ -154,7 +148,17 @@ class VideoPlayer:
         if not self.__video_path:
             return
 
-        self.__movie_name = os.path.basename(self.__video_path)
+        self.__audio_path = filedialog.askopenfilename(
+            initialdir=".",
+            title="Select a wav file",
+            filetypes=(("WAV files", "*.wav"),),
+        )
+        if not self.__audio_path:
+            return
+        
+        sound_file = self.__audio_path
+        pygame.mixer.music.load(sound_file)
+
         self.__buttons_scroll_view.clear_content()
 
         self.__video_frame.load_video(self.__video_path)
@@ -192,7 +196,7 @@ class VideoPlayer:
             200,
             height,
             pygame.font.SysFont(None, font_size),
-            "Movie: " + self.__movie_name
+            "Movie: " + os.path.basename(self.__video_path)
         )
         self.__buttons_scroll_view.add_to_content(movie_text)
 
