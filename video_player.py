@@ -64,7 +64,12 @@ class VideoPlayer:
         self.__progress_text = ui.Text(self.__screen, 10, 10, self.__font)
 
         self.__buttons_scroll_view = ui.ScrollView(
-            self.__screen, self.window_width / 2 + 200, 80, 400, 400, content_background_color="#C2E7D9"
+            self.__screen,
+            self.window_width / 2 + 200,
+            80,
+            400,
+            400,
+            content_background_color="#C2E7D9",
         )
 
         self.__open_button = ui.Button(
@@ -155,7 +160,7 @@ class VideoPlayer:
         )
         if not self.__audio_path:
             return
-        
+
         sound_file = self.__audio_path
         pygame.mixer.music.load(sound_file)
 
@@ -189,19 +194,6 @@ class VideoPlayer:
         scene_buttons = []
 
         y = margin_y
-        movie_text = ui.Button(
-            self.__screen,
-            margin_x,
-            y,
-            200,
-            height,
-            pygame.font.SysFont(None, font_size),
-            "Movie: " + os.path.basename(self.__video_path)
-        )
-        self.__buttons_scroll_view.add_to_content(movie_text)
-
-        y += 40
-
         for i, scene in enumerate(scenes):
             time = scene[0].get_seconds()
             scene_button = ui.Button(
@@ -252,7 +244,7 @@ class VideoPlayer:
             scene_button.x + scene_button.width + margin_x,
             scene_button.y + scene_button.height + margin_y,
         )
-        if(shots.__len__()==0):
+        if shots.__len__() == 0:
             time = scene[0].get_seconds()
             button = button = ui.Button(
                 self.__screen,
@@ -266,6 +258,7 @@ class VideoPlayer:
             )
             self.__buttons_scroll_view.add_to_content(button)
             buttons.append(button)
+            print("vp_" + str(button.y))
         else:
             for i, shot in enumerate(shots):
                 time = shot[0].get_seconds()
@@ -281,4 +274,5 @@ class VideoPlayer:
                 )
                 self.__buttons_scroll_view.add_to_content(button)
                 buttons.append(button)
+
         return buttons
