@@ -100,7 +100,7 @@ class VideoPlayer:
             self.__video_frame.pause,
         )
         self.__pause_button.visible = False
-        
+
         self.__stop_button = ui.Button(
             self.__screen,
             550,
@@ -112,7 +112,7 @@ class VideoPlayer:
             self.__video_frame.stop,
         )
         self.__stop_button.visible = False
-        
+
     # handle the player events
     def __handle_events(self):
         for event in pygame.event.get():
@@ -192,10 +192,9 @@ class VideoPlayer:
         self.__make_scene_buttons(scenes)
 
     # make index buttons for scenes
-    # TODO: better interactivity
     def __make_scene_buttons(
         self, scenes: list[tuple[FrameTimecode, FrameTimecode]]
-    ) -> list[ui.Button]:
+    ) -> None:
         font_size: int = 15
         width: int = 80
         height: int = 20
@@ -226,11 +225,8 @@ class VideoPlayer:
             else:
                 y = scene_button.y + height
             y += margin_y
-            # scene_buttons.extend(shot_buttons)
-        return scene_buttons
 
     # make index buttons for shots
-    # TODO: better interactivity
     def __make_shot_buttons(
         self,
         scene_button: ui.Button,
@@ -240,8 +236,9 @@ class VideoPlayer:
         height: int = 20,
         margin_x: int = 5,
         margin_y: int = 5,
-        subshot: bool = False
-    ) -> list[ui.Button]:
+        subshot: bool = False,
+        min_length: int = 15,
+    ) -> int:
         buttons = []
         last_position = 0
 
@@ -264,7 +261,6 @@ class VideoPlayer:
             button = button = ui.Button(
                 self.__screen,
                 start_position[0],
-                # start_position[1],
                 y,
                 width,
                 height,
@@ -281,7 +277,6 @@ class VideoPlayer:
                     self.__screen,
                     start_position[0],
                     y,
-                    # start_position[1] + i * (height + margin_y),
                     width,
                     height,
                     pygame.font.SysFont(None, font_size),
@@ -292,12 +287,14 @@ class VideoPlayer:
                 buttons.append(button)
 
                 # subshot
-                l = 0
-                if len(buttons) > 1 and calculate_length(shot) > 15:
-                    l = self.__make_shot_buttons(button, shot, subshot=True)
+                last = 0
+                shot_length = shot[1].get_seconds() - shot[0].get_seconds()
+                if len(buttons) > 1 and shot_length > min_length:
+                    last = self.__make_shot_buttons(
+                        button, shot, subshot=True, min_length=min_length
+                    )
 
-                if l > 0:
-                    last = l
+                if last > 0:
                     last_position = max(last_position, last)
                     y = last_position
                 else:
@@ -308,7 +305,3 @@ class VideoPlayer:
             last_position = max(last_position, buttons[-1].y + buttons[-1].height)
 
         return last_position
-    
-    
-def calculate_length(time_code):
-    return time_code[1].get_seconds() - time_code[0].get_seconds()
