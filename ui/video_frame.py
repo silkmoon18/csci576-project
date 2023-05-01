@@ -5,6 +5,7 @@ import cv2
 # frame that displays a video
 class VideoFrame(UIElement):
     def __init__(self, screen: pygame.Surface, x: int, y: int) -> None:
+        pygame.mixer.init()
         super().__init__(screen, x, y, 400, 300, background_color="#C2E7D9")
 
         self.__frame = None
@@ -50,6 +51,7 @@ class VideoFrame(UIElement):
     def stop(self) -> None:
         self.__playing = False
         self.jump_to(0)
+        pygame.mixer.music.stop()
 
     # set the update interval based on program fps
     def set_interval(self, program_fps: int) -> None:
@@ -61,11 +63,11 @@ class VideoFrame(UIElement):
         self.__frame_count = 0
 
     # load a video from the specified path
-    def load_video(self, video_path: str = None) -> None:
+    def load(self, video_path: str = None, audio_path: str = None) -> None:
         if self.__capture:
             self.__capture.release()
 
-        if video_path:
+        if video_path and audio_path:
             self.__capture = cv2.VideoCapture(video_path)
             self.__fps = int(self.__capture.get(cv2.CAP_PROP_FPS))
             self.width = int(self.__capture.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -73,6 +75,7 @@ class VideoFrame(UIElement):
             self.__duration = int(
                 self.__capture.get(cv2.CAP_PROP_FRAME_COUNT) / self.__fps
             )
+            pygame.mixer.music.load(audio_path)
         else:
             self.__capture = None
             self.__fps = 0
@@ -89,11 +92,12 @@ class VideoFrame(UIElement):
         self.__current_time = (
             int(self.__capture.get(cv2.CAP_PROP_POS_FRAMES)) / self.__fps
         )
-        if time == 0:
-            pygame.mixer.music.stop()
-        else:
-            pygame.mixer.music.play(0, time, 0)
         self.__next()
+
+        pygame.mixer.music.play(0, time, 0)
+        if not self.__playing:
+            pygame.mixer.music.pause()
+            
 
     # override
     def _on_update(self) -> None:

@@ -53,8 +53,6 @@ class VideoPlayer:
         pygame.init()
         pygame.display.set_caption(self.title)
 
-        pygame.mixer.init()
-
         self.__screen = pygame.display.set_mode((self.window_width, self.window_height))
         self.__clock = pygame.time.Clock()
         self.__font = pygame.font.SysFont(None, 24)
@@ -168,12 +166,9 @@ class VideoPlayer:
         if not self.__audio_path:
             return
 
-        sound_file = self.__audio_path
-        pygame.mixer.music.load(sound_file)
-
         self.__buttons_scroll_view.clear_content()
 
-        self.__video_frame.load_video(self.__video_path)
+        self.__video_frame.load(self.__video_path, self.__audio_path)
         self.__video_frame.set_interval(self.__program_fps)
         self.__process_video()
 
@@ -182,7 +177,6 @@ class VideoPlayer:
         self.__stop_button.visible = True
 
     # process current video
-    # TODO: better interactivity
     def __process_video(self):
         scenes = detect(
             self.__video_path,
