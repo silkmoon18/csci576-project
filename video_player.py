@@ -60,56 +60,75 @@ class VideoPlayer:
     # initialize UI interface
     def __init_interface(self):
         # init ui elements
-        self.__video_frame = ui.VideoFrame(self.__screen, 250, 0)
-        self.__progress_text = ui.Text(self.__screen, 10, 10, self.__font)
+        self.__video_frame = ui.VideoFrame(self.__screen, 10, 10, 960, 540, "#383c44")
+        self.__progress_text = ui.Text(self.__screen, 820, 560, self.__font)
 
         self.__buttons_scroll_view = ui.ScrollView(
             self.__screen,
-            self.window_width / 2 + 200,
-            80,
-            400,
-            400,
-            content_background_color="#C2E7D9",
+            990,
+            10,
+            500,
+            780,
+            content_background_color="#383c44",
         )
 
         self.__open_button = ui.Button(
-            self.__screen, 80, 400, 100, 60, self.__font, "open", self.__open_video
+            self.__screen,
+            10,
+            560,
+            100,
+            60,
+            self.__font,
+            "open",
+            self.__open_video,
+            "#50555e",
+            "#666c78",
+            "#7a8291",
         )
         self.__play_button = ui.Button(
             self.__screen,
-            250,
-            400,
+            290,
+            560,
             100,
             60,
             self.__font,
             "play",
             self.__video_frame.play,
+            "#50555e",
+            "#666c78",
+            "#7a8291",
         )
-        self.__play_button.visible = False
+        # self.__play_button.visible = False
 
         self.__pause_button = ui.Button(
             self.__screen,
-            400,
-            400,
+            440,
+            560,
             100,
             60,
             self.__font,
             "pause",
             self.__video_frame.pause,
+            "#50555e",
+            "#666c78",
+            "#7a8291",
         )
-        self.__pause_button.visible = False
+        # self.__pause_button.visible = False
 
         self.__stop_button = ui.Button(
             self.__screen,
-            550,
-            400,
+            590,
+            560,
             100,
             60,
             self.__font,
             "stop",
             self.__video_frame.stop,
+            "#50555e",
+            "#666c78",
+            "#7a8291",
         )
-        self.__stop_button.visible = False
+        # self.__stop_button.visible = False
 
     # handle the player events
     def __handle_events(self):
@@ -139,7 +158,7 @@ class VideoPlayer:
     def __update(self):
         self.__screen.fill(self.background_color)
 
-        self.__progress_text.text = "{:.2f} / {:.2f}".format(
+        self.__progress_text.text = "{} / {}".format(
             self.__video_frame.current_time, self.__video_frame.duration
         )
 
@@ -209,11 +228,16 @@ class VideoPlayer:
                 pygame.font.SysFont(None, font_size),
                 "scene_" + str(i + 1),
                 lambda t=time: self.__video_frame.jump_to(t),
+                "#50555e",
+                "#666c78",
+                "#7a8291",
             )
             self.__buttons_scroll_view.add_to_content(scene_button)
             scene_buttons.append(scene_button)
 
-            last_position = self.__make_shot_buttons(scene_button, scene)
+            last_position = self.__make_shot_buttons(
+                scene_button, scene, font_size, width, height
+            )
             if last_position > 0:
                 y = last_position
             else:
@@ -261,12 +285,18 @@ class VideoPlayer:
                 pygame.font.SysFont(None, font_size),
                 "shot_1",
                 lambda t=time: self.__video_frame.jump_to(t),
+                "#50555e",
+                "#666c78",
+                "#7a8291",
             )
             self.__buttons_scroll_view.add_to_content(button)
             buttons.append(button)
         else:
             for i, shot in enumerate(shots):
                 time = shot[0].get_seconds()
+
+                button_text = "subshot_" if subshot else "shot_"
+                button_text += str(i + 1)
                 button = ui.Button(
                     self.__screen,
                     start_position[0],
@@ -274,8 +304,11 @@ class VideoPlayer:
                     width,
                     height,
                     pygame.font.SysFont(None, font_size),
-                    "shot_" + str(i + 1),
+                    button_text,
                     lambda t=time: self.__video_frame.jump_to(t),
+                    "#50555e",
+                    "#666c78",
+                    "#7a8291",
                 )
                 self.__buttons_scroll_view.add_to_content(button)
                 buttons.append(button)

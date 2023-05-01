@@ -2,17 +2,32 @@ from .ui_element import *
 import cv2
 
 
+def to_HMS(seconds: int) -> str:
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    seconds = seconds % 60
+    return "{:02d}:{:02d}:{:02d}".format(int(hours), int(minutes), int(seconds))
+
+
 # frame that displays a video
 class VideoFrame(UIElement):
-    def __init__(self, screen: pygame.Surface, x: int, y: int) -> None:
+    def __init__(
+        self,
+        screen: pygame.Surface,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        background_color: str = "#ffffff",
+    ) -> None:
         pygame.mixer.init()
-        super().__init__(screen, x, y, 400, 300, background_color="#C2E7D9")
+        super().__init__(screen, x, y, width, height, background_color=background_color)
 
         self.__frame = None
         self.__capture: cv2.VideoCapture = None
         self.__fps = 0
         self.__duration = 0
-        self.__current_time = 0
+        self.__current_time = 0  # in seconds
 
         self.__update_interval = 0
         self.__frame_count = 0
@@ -23,12 +38,12 @@ class VideoFrame(UIElement):
         return self.__fps
 
     @property
-    def duration(self) -> int:
-        return self.__duration
+    def duration(self) -> str:
+        return to_HMS(self.__duration)
 
     @property
-    def current_time(self) -> int:
-        return self.__current_time
+    def current_time(self) -> str:
+        return to_HMS(self.__current_time)
 
     # toggle playing state
     def toggle(self) -> None:
@@ -70,8 +85,6 @@ class VideoFrame(UIElement):
         if video_path and audio_path:
             self.__capture = cv2.VideoCapture(video_path)
             self.__fps = int(self.__capture.get(cv2.CAP_PROP_FPS))
-            self.width = int(self.__capture.get(cv2.CAP_PROP_FRAME_WIDTH))
-            self.height = int(self.__capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
             self.__duration = int(
                 self.__capture.get(cv2.CAP_PROP_FRAME_COUNT) / self.__fps
             )
@@ -79,8 +92,6 @@ class VideoFrame(UIElement):
         else:
             self.__capture = None
             self.__fps = 0
-            self.width = 0
-            self.height = 0
             self.__duration = 0
 
         self.__current_time = 0
@@ -97,7 +108,6 @@ class VideoFrame(UIElement):
         pygame.mixer.music.play(0, time, 0)
         if not self.__playing:
             pygame.mixer.music.pause()
-            
 
     # override
     def _on_update(self) -> None:
@@ -129,5 +139,6 @@ class VideoFrame(UIElement):
         if not success:
             return False
 
+        self.__frame = cv2.resize(self.__frame, (self.width, self.height))
         self.__frame = cv2.cvtColor(self.__frame, cv2.COLOR_BGR2RGB).swapaxes(0, 1)
         return True

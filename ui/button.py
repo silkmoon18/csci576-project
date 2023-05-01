@@ -11,7 +11,7 @@ class Button(UIElement):
         y: int,
         width: int,
         height: int,
-        font: pygame.font,
+        font: pygame.font.Font,
         button_text: str = "Button",
         on_click: Callable = None,
         color_normal: str = "#ffffff",
@@ -25,7 +25,7 @@ class Button(UIElement):
         self.color_hover = color_hover
         self.color_pressed = color_pressed
 
-        self.text = font.render(button_text, True, (20, 20, 20))
+        self.text = font.render(button_text, True, "#ffffff")
 
         self.__pressed = False
 

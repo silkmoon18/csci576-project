@@ -41,9 +41,9 @@ class ContentView(UIElement):
     # get the length of content
     def get_length(self) -> int:
         return self.__last_position
-    
+
     # clear all content elements
-    def clear(self)->None:
+    def clear(self) -> None:
         self.delete_all_children()
         self.__current_position = 0
         self.__last_position = 0
@@ -66,10 +66,10 @@ class ScrollBar(UIElement):
         screen: pygame.Surface,
         scroll_view_width: int,
         scroll_view_height: int,
-        width: int = 10,
         color_normal: str = "#ffffff",
         color_hover: str = "#DADDD8",
         color_pressed: str = "#1C1C1C",
+        width: int = 10,
     ) -> None:
         super().__init__(
             screen,
@@ -85,7 +85,7 @@ class ScrollBar(UIElement):
         self.__dragging = False
 
     @property
-    def dragging(self)->bool:
+    def dragging(self) -> bool:
         return self.__dragging
 
     # override
@@ -133,9 +133,18 @@ class ScrollView(UIElement):
         )
         self.__content.parent = self
 
-        self.__scroll_bar = ScrollBar(screen, width, height)
+        self.__scroll_bar = ScrollBar(
+            screen,
+            width,
+            height,
+            "#50555e",
+            "#666c78",
+            "#7a8291",
+        )
+        self.__scroll_bar.visible = False
         self.__scroll_bar.parent = self
-        self.__previous_mouse_position = 0 # for calculating mouse delta position
+
+        self.__previous_mouse_position = 0  # for calculating mouse delta position
 
     # add a UI element to the content
     def add_to_content(self, element: UIElement) -> None:
@@ -145,6 +154,7 @@ class ScrollView(UIElement):
         self.__scroll_bar.height = (
             self.height / self.__content.get_length() * self.height
         )
+        self.__scroll_bar.visible = self.height < self.__content.get_length()
 
     # clear content
     def clear_content(self) -> None:
